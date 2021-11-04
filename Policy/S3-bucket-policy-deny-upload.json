@@ -1,0 +1,14 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "BucketPolicy-Deny-Write",
+            "Effect": "Deny",
+            "Principal": {
+                "AWS": "*"
+            },
+            "Action": "s3:PutObject",
+            "Resource": "arn:aws:s3:::codestar-t10-s3/test/*"
+        }
+    ]
+}

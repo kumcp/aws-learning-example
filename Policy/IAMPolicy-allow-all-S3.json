@@ -1,0 +1,11 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "allowAccessS3",
+            "Effect": "Allow",
+            "Action": "s3:*",
+            "Resource": "arn:aws:s3:::codestar-t10-s3/*"
+        }
+    ]
+}
