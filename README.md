@@ -1,5 +1,9 @@
 # aws-learning-example
 Example and learning script for reference
 
+These project include:
 
-These are shell script helper for running as bootstrap of an EC2.
+- Shell script helpers for running as bootstrap for fast building EC2.
+- Script for some functions in Lambda
+- Some common policy in S3
+- S
