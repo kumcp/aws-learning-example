@@ -1,0 +1,6 @@
+
+FROM ubuntu
+
+RUN echo "Hello world"
+
+CMD echo "Run command"
