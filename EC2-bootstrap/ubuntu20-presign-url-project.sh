@@ -16,3 +16,5 @@ curl -LO https://github.com/kumcp/aws-learning-example/raw/main/demo-project/aws
 unzip ./aws-basis-s3-presigned-url-master.zip
 
 cd ./aws-basis-s3-presigned-url-master
+
+npm install && node index.js
