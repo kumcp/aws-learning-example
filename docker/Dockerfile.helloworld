@@ -1,12 +1,11 @@
 
 FROM alpine
 
-RUN echo "=================="
+
 RUN echo "This is the command will run in build time"
-RUN echo "=================="
 
 RUN echo "#!/bin/bash" >> run-time-script.sh
-RUN echo "echo \"This will run in build time\"" >> run-time-script.sh
+RUN echo "echo \"This will run in run-time\"" >> run-time-script.sh
 RUN chmod +x run-time-script.sh
 
 
