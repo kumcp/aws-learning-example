@@ -9,7 +9,9 @@ RUN echo "#!/bin/bash" >> run-time-script.sh
 RUN echo "echo \"This will run in build time\"" >> run-time-script.sh
 RUN chmod +x run-time-script.sh
 
+
+# entrypoint is for when running with docker run <image-id> <param>
 #ENTRYPOINT ["tail", "-f", "/dev/null"]
 
-
-CMD ["sh /run-time-script.sh"]
+# cmd is for when running with docker run <image-id>
+CMD ["sh", "/run-time-script.sh"]
