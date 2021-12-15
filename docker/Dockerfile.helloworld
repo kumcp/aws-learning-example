@@ -1,6 +1,15 @@
 
-FROM ubuntu
+FROM alpine
 
-RUN echo "Hello world"
+RUN echo "=================="
+RUN echo "This is the command will run in build time"
+RUN echo "=================="
 
-CMD echo "Run command"
+RUN echo "#!/bin/bash" >> run-time-script.sh
+RUN echo "echo \"This will run in build time\"" >> run-time-script.sh
+RUN chmod +x run-time-script.sh
+
+#ENTRYPOINT ["tail", "-f", "/dev/null"]
+
+
+CMD ["sh /run-time-script.sh"]

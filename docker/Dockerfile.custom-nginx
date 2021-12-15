@@ -1,0 +1,4 @@
+FROM nginx:latest
+
+
+RUN echo "This is the page from nginx" >> /usr/share/nginx/html/index.html
