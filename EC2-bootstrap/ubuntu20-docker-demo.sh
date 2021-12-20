@@ -51,3 +51,9 @@ docker run -d --name=codestar_simple_container hw:1.0.0
 # Execute some command for debugging
 docker exec -it hw:1.0.0
 
+# Demo with mount at runtime
+docker run -d \
+    -v "$(pwd)"/kipalog:/var/test \
+    custom-nginx:v1.1
+
+docker run -d --mount type=bind,source="$(pwd)"/kipalog,target=/var/test custom-nginx:v1.1
