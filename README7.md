@@ -31,7 +31,7 @@ docker swarm join --token <token> <master-node-ip>:2377
 ## Add a yml file to stack
 
 ```
-docker stack deploy --compose-file stack.yml
+docker stack deploy --compose-file stack.yml <stack-name>
 ```
 
 Check the stack:
@@ -48,3 +48,9 @@ UDP/TCP
 ```
 
 -   Open port 8080
+
+## Update service replicas
+
+```
+docker service update --replicas 3 <service-name>
+```

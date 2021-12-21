@@ -1,0 +1,5 @@
+{
+    "cfnLint.path": "cfn-env/bin/cfn-lint",
+    "python.pythonPath": "cfn-env/bin/python3",
+    "python.defaultInterpreterPath": "cfn-env/bin/python3"
+}
