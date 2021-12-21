@@ -1,6 +1,8 @@
-AWSTemplateFormatVersion: 2010-09-09
+AWSTemplateFormatVersion: "2010-09-09"
 Description: This is description
-Metadata: Metadata
+Metadata:
+  Instances : 
+    Description: Information about the instances
 
 Parameters: 
 
@@ -24,8 +26,8 @@ Parameters:
 
 Mappings: 
 
-  AWSInstanceType2Arch":
-    t2.micro":
+  AWSInstanceType2Arch:
+    t2.micro:
       Arch: HVM64
 
   AMIByRegion:
@@ -37,12 +39,17 @@ Resources:
   ServerEC2:
     Type: AWS::EC2::Instance
     Properties:
-      KeyName: 
-        - !Ref Ec2KeyName 
-      ImageId: ''
-      InstanceType: 
-        - !Ref InstanceType
-      SecurityGroups:
+      KeyName: !Ref Ec2KeyName 
+      ImageId:
+        !FindInMap
+          - AMIByRegion
+          - !Ref AWS::Region
+          - !FindInMap
+            - AWSInstanceType2Arch
+            - !Ref InstanceType
+            - Arch
+      InstanceType: !Ref InstanceType
+      SecurityGroups: 
         - !Ref SecurityGroup
       Tags:
         - Key: key
@@ -54,14 +61,11 @@ Resources:
       GroupName: server-sg
       GroupDescription: Default Security Group for EC2 instance
       SecurityGroupIngress:
-        IpProtocol: tcp
-        FromPort: 22
-        ToPort: 22
-        CidrIp: 
-          - !Ref SSHLocation 
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref SSHAllowIps 
  
-      SecurityGroupEgress:
-        - Security Group Rule
       Tags:
         - Key: project
           Value: cd-lab1
@@ -69,33 +73,32 @@ Resources:
 Outputs:
   InstanceId:
     Description: InstanceId of the new EC2 instance
-    Value: 
-      - !Ref: EC2Instance
+    Value: !Ref ServerEC2
 
   AZ: 
     Description: Availability Zone of the newly created EC2 instance
-    Value:
-      !GetAtt:
-        - EC2Instance
+    Value: 
+      !GetAtt
+        - ServerEC2
         - AvailabilityZone
 
   PublicDNS: 
     Description: Public DNSName of the newly created EC2 instance
     Value: 
-      !GetAtt: 
-        - EC2Instance
+      !GetAtt
+        - ServerEC2
         - PublicDnsName
 
   PublicIP: 
     Description:  Public IP address of the newly created EC2 instance
     Value: 
-      !GetAtt: 
-        - EC2Instance
+      !GetAtt
+        - ServerEC2
         - PublicIp
   
   PrivateIP:
     Description:  Private IP address of the newly created EC2 instance in VPC
     Value: 
-      !GetAtt: 
-        - EC2Instance
+      !GetAtt
+        - ServerEC2
         - PrivateIp
