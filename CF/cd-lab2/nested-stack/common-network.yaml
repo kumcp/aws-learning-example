@@ -49,7 +49,7 @@ Resources:
     UpdateReplacePolicy: Delete
     Properties:
       TemplateURL: >-
-        https://s3.amazonaws.com/cloudformation-templates-us-east-2/EC2ChooseAMI.template
+        https://raw.githubusercontent.com/kumcp/aws-learning-example/main/CF/cd-lab2/single-resource-stack/VPC.yaml
       Parameters:
         ProjectName: !Ref ProjectName
         ProjectEnvironment: !Ref ProjectEnvironment
