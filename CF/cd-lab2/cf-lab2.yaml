@@ -1,0 +1,43 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: This script create an EC2 has bootstrap script with a Role and a VPC corresponding
+
+Metadata: 
+  Instance: 
+    Description: Instance will based on an ubuntu 20 (free tier)
+  VPC:
+    Description: A public VPC
+  Role:
+    Description: A new Role will be created. This role will have the ability to access a specific RDS
+  RDS:
+    Description: A new RDS with a specific name will be created if it doesn't exist.
+    
+
+Parameters:
+  Ec2KeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instance
+    Type: AWS::EC2::KeyPair::KeyName
+    ConstraintDescription: You have to specify a key name to create EC2 instance
+
+  InstanceType:
+    Type: String
+    Default: t2.micro
+    ConstraintDescription: This template only allow 2 type of instance, which is [t2.micro, t2.nano]
+    AllowedValues:
+      - t2.micro
+      - t2.nano
+
+  SSHAllowIps:
+    Type: String
+    AllowedPattern: "([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})/([0-9]{1,2})"
+    ConstraintDescription: You need to specify IP range can ssh to this EC2 instance 
+
+Mappings: 
+
+Conditions: 
+
+Resources: 
+
+  
+
+Outputs:

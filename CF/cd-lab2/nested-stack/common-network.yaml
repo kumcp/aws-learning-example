@@ -1,0 +1,69 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: A common network include 1 private, 1 public subnet for VPC
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: 'Project Setup'
+        Parameters:
+          - ProjectName
+          - ProjectEnvironment
+      
+      - Label:
+          default: 'VPC configuration'
+        Parameters:
+          - VpcCIDRBlock
+
+    ParameterLabels:
+      ProjectName:
+        default: 'Project name'
+      ProjectEnvironment:
+        default: 'Project environment'
+      VpcCIDRBlock:
+        default: 'Type of EC2 Instance'
+
+Parameters: 
+  ProjectName:
+    Description: You need to specify a project name for all the stack you are creating.
+    Type: String
+
+  ProjectEnvironment:
+    Description: You need to specify a name of the environment.
+    Type: String
+
+  VpcCIDRBlock:
+    Description: You need to specify an VPC CIDR Block like 172.1.0.0/16
+    Type: String
+    AllowedPattern: "([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})/([0-9]{1,2})"
+    Default: "172.1.0.0/16"
+
+
+# Mappings: 
+
+# Conditions: 
+
+Resources: 
+  customVPC:
+    Type: AWS::CloudFormation::Stack
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Delete
+    Properties:
+      TemplateURL: >-
+        https://s3.amazonaws.com/cloudformation-templates-us-east-2/EC2ChooseAMI.template
+      Parameters:
+        ProjectName: !Ref ProjectName
+        ProjectEnvironment: !Ref ProjectEnvironment
+        VpcCIDRBlock: !Ref VpcCIDRBlock
+
+Outputs:
+  VPCId:
+    Description: VPC Id created
+    Value: !Ref customVPC
+
+  DefaultNetworkAcl:
+    Description: Default Network Acl
+    Value: !GetAtt [customVPC,DefaultNetworkAcl]
+
+  DefaultSecurityGroup:
+    Description: Default Security Group
+    Value: !GetAtt [customVPC,DefaultSecurityGroup]
