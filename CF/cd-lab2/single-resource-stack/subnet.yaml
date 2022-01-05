@@ -38,7 +38,7 @@ Parameters:
     Type: String
 
   VPC:
-    Description: You need to specify an VPC CIDR Block like 172.1.0.0/16
+    Description: You need to specify a VPC
     Type: AWS::EC2::VPC::Id
 
   PrivateCIDR:

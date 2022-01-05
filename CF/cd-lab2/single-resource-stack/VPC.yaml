@@ -21,6 +21,8 @@ Metadata:
         default: 'Project environment'
       VpcCIDRBlock:
         default: 'Type of EC2 Instance'
+      IncludeIGW:
+        default: 'Include Internet Gateway'
 
 Parameters: 
   ProjectName:
@@ -37,10 +39,16 @@ Parameters:
     AllowedPattern: "([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})/([0-9]{1,2})"
     Default: "172.1.0.0/16"
 
+  IncludeIGW:
+    Description: If this VPC include Internet GW or not.
+    Type: String
+    AllowedValues: [true, false]
+
 
 # Mappings: 
 
-# Conditions: 
+Conditions: 
+  HasIGW: !Equals [!Ref IncludeIGW, true]
 
 Resources: 
   customVPC:
@@ -56,6 +64,21 @@ Resources:
         - Key: Name
           Value: !Join ["-", [!Ref ProjectName, !Ref ProjectEnvironment]] 
 
+  IGW:
+    Type: AWS::EC2::InternetGateway
+    Condition: HasIGW
+    Properties:
+      Tags: 
+        - Key: Name
+          Value: !Join ["-", [!Ref ProjectName, !Ref ProjectEnvironment]] 
+
+  AttachIGW:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Condition: HasIGW
+    Properties:
+      VpcId: !Ref customVPC
+      InternetGatewayId: !Ref IGW
+
 Outputs:
   VPCId:
     Description: VPC Id created
@@ -68,3 +91,8 @@ Outputs:
   DefaultSecurityGroup:
     Description: Default Security Group
     Value: !GetAtt [customVPC,DefaultSecurityGroup]
+
+  IGWId:
+    Condition: HasIGW
+    Description: Internet GW Id
+    Value: !GetAtt [IGW, InternetGatewayId]

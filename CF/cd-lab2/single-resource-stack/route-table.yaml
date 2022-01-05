@@ -1,0 +1,88 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Define a new route table 
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: 'Project Setup'
+        Parameters:
+          - ProjectName
+          - ProjectEnvironment
+
+      - Label:
+          default: 'Route table setup'
+        Parameters:
+          - VPC
+          - Subnet
+          - IGWId
+
+    ParameterLabels:
+      ProjectName:
+        default: 'Project name'
+      ProjectEnvironment:
+        default: 'Project environment'
+      Subnet:
+        default: 'Subnet subnet'
+      VPC:
+        label: Choose VPC
+      IGWId:
+        label: Internet Gateway Id
+
+Parameters: 
+  ProjectName:
+    Description: You need to specify a project name for all the stack you are creating.
+    Type: String
+
+  ProjectEnvironment:
+    Description: You need to specify a name of the environment.
+    Type: String
+
+  VPC:
+    Description: You need to specify a VPC
+    Type: AWS::EC2::VPC::Id
+
+  Subnet:
+    Description: You need to specify a subnet
+    Type: AWS::EC2::Subnet::Id
+
+  IGWId:
+    Description: You need to assign an Internet Gateway
+    Type: String
+
+
+# Mappings: 
+
+# Conditions: 
+
+Resources: 
+  RouteTablePublic:
+    Type: AWS::EC2::RouteTable
+    Properties: 
+      Tags: 
+        - Key: Name
+          Value: !Join ["-", [!Ref ProjectName, !Ref ProjectEnvironment]] 
+        - Key: Project
+          Value: !Ref ProjectName
+        - Key: Environment
+          Value: !Ref ProjectEnvironment
+      VpcId: !Ref VPC
+
+  AttachIGW:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTablePublic
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref IGWId
+
+  AttachSubnetRTBPublic:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+       RouteTableId: !Ref RouteTablePublic
+       SubnetId: !Ref Subnet
+
+
+Outputs:
+  RouteTablePublicId:
+    Description: Public route table Id created
+    Value: !Ref RouteTablePublic
+
