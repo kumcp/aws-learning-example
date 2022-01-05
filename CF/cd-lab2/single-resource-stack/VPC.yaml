@@ -83,6 +83,8 @@ Outputs:
   VPCId:
     Description: VPC Id created
     Value: !Ref customVPC
+    Export:
+      Name: !Sub '${AWS::StackName}-VPCId'
 
   DefaultNetworkAcl:
     Description: Default Network Acl
@@ -96,3 +98,5 @@ Outputs:
     Condition: HasIGW
     Description: Internet GW Id
     Value: !GetAtt [IGW, InternetGatewayId]
+    Export:
+      Name: !Sub '${AWS::StackName}-IGWId'

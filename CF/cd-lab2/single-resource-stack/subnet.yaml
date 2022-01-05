@@ -99,8 +99,12 @@ Outputs:
   PublicSubnetId:
     Description: Public subnet Id created
     Value: !Ref PublicSubnet
+    Export:
+      Name: !Sub '${AWS::StackName}-PublicSubnetId'
 
   PrivateSubnetId:
     Description: Public subnet Id created
     Value: !Ref PrivateSubnet
+    Export:
+      Name: !Sub '${AWS::StackName}-PrivateSubnetId'
 
