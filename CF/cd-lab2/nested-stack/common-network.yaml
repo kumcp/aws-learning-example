@@ -70,7 +70,7 @@ Resources:
         ProjectName: !Ref ProjectName
         ProjectEnvironment: !Ref ProjectEnvironment
         VpcCIDRBlock: !Ref VpcCIDRBlock
-        IncludeIGW: "true"
+        IncludeIGW: true
   
   SubnetPrivatePublic:
     Type: AWS::CloudFormation::Stack
@@ -82,7 +82,7 @@ Resources:
       Parameters:
         ProjectName: !Ref ProjectName
         ProjectEnvironment: !Ref ProjectEnvironment
-        VPC: !Ref customVPC 
+        VPC: !GetAtt [customVPC, Outputs.VPCId]
         PrivateCIDR: !Ref PrivateCIDRBlock
         PublicCIDR: !Ref PublicCIDRBlock
 
@@ -96,14 +96,14 @@ Resources:
       Parameters:
         ProjectName: !Ref ProjectName
         ProjectEnvironment: !Ref ProjectEnvironment
-        VPC: !Ref customVPC 
-        Subnet: !GetAtt [customVPC, Outputs.PublicSubnetId]
+        VPC: !GetAtt [customVPC, Outputs.VPCId]
+        Subnet: !GetAtt [SubnetPrivatePublic, Outputs.PublicSubnetId]
         IGWId: !GetAtt [customVPC, Outputs.IGWId]
 
 Outputs:
   VPCId:
     Description: VPC Id created
-    Value: !Ref customVPC
+    Value: !GetAtt [customVPC, Outputs.VPCId]
   
   DefaultNetworkAcl:
     Description: Default Network Acl
@@ -115,8 +115,8 @@ Outputs:
 
   PrivateSubnetId:
     Description: Private subnet id
-    Value: !GetAtt [customVPC, Outputs.PrivateSubnetId]
+    Value: !GetAtt [SubnetPrivatePublic, Outputs.PrivateSubnetId]
 
   PublicSubnetId:
     Description: Private subnet id
-    Value: !GetAtt [customVPC, Outputs.PublicSubnetId]
+    Value: !GetAtt [SubnetPrivatePublic, Outputs.PublicSubnetId]

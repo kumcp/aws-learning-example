@@ -43,6 +43,7 @@ Parameters:
     Description: If this VPC include Internet GW or not.
     Type: String
     AllowedValues: [true, false]
+    Default: true
 
 
 # Mappings: 
@@ -83,20 +84,16 @@ Outputs:
   VPCId:
     Description: VPC Id created
     Value: !Ref customVPC
-    Export:
-      Name: !Sub '${AWS::StackName}-VPCId'
 
   DefaultNetworkAcl:
     Description: Default Network Acl
-    Value: !GetAtt [customVPC,DefaultNetworkAcl]
+    Value: !GetAtt [customVPC, DefaultNetworkAcl]
 
   DefaultSecurityGroup:
     Description: Default Security Group
-    Value: !GetAtt [customVPC,DefaultSecurityGroup]
+    Value: !GetAtt [customVPC, DefaultSecurityGroup]
 
   IGWId:
     Condition: HasIGW
     Description: Internet GW Id
     Value: !GetAtt [IGW, InternetGatewayId]
-    Export:
-      Name: !Sub '${AWS::StackName}-IGWId'
