@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      run: nginx-pod
+  template:
+    metadata:
+      labels:
+        run: nginx-pod
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        resources:  
+          limits:
+            cpu: 100m
+            memory: 200Mi
+        ports:
+        - containerPort: 9080
+        # Set the SYSTEM_APP_USERNAME and SYSTEM_APP_PASSWORD environment variables
