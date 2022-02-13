@@ -8,11 +8,11 @@ spec:
   replicas: 3
   selector:
     matchLabels:
-      run: nginx-pod
+      run: my-nginx
   template:
     metadata:
       labels:
-        run: nginx-pod
+        run: my-nginx
     spec:
       containers:
       - name: nginx
