@@ -1,0 +1,174 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Define an EC2 with common SG attached to it
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: 'Project Setup'
+        Parameters:
+          - ProjectName
+          - ProjectEnvironment
+
+      - Label:
+          default: 'Instance setup'
+        Parameters:
+          - InstanceType
+          - Subnet
+          - SSHAllowIps
+          - KeyName
+          - OpenHTTP
+
+    ParameterLabels:
+      ProjectName:
+        default: Project name
+      ProjectEnvironment:
+        default: Project environment
+      Subnet:
+        default: Choose Subnet for instance
+      InstanceType:
+        default: Choose instance type
+      SSHAllowIps:
+        default: Choose IP address allowed to SSH
+      KeyName:
+        default: Choose key pair for SSH
+      OpenHTTP:
+        default: Allow open port 80 for HTTP
+      
+
+Parameters: 
+  ProjectName:
+    Type: String
+    Default: demo
+    Description: You need to specify a project name for all the stack you are creating.
+
+  ProjectEnvironment:
+    Type: String
+    Default: test
+    Description: You need to specify a name of the environment.
+
+  VPC:
+    Type: AWS::EC2::VPC::Id
+    Description: Choose a VPC.
+
+  Subnet:
+    Type: AWS::EC2::Subnet::Id
+    Description: Choose a subnet.
+
+  InstanceType:
+    Default: t2.micro
+    AllowedValues: [t2.micro, t2.small]
+    Type: String
+    Description: Input instance type  
+
+  SSHAllowIps:
+    Default: 0.0.0.0/0
+    Type: String
+    AllowedPattern: "([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})/([0-9]{1,2})"
+    ConstraintDescription: You need to specify IP range can ssh to this EC2 instance
+
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+
+  OpenHTTP:
+    Type: String
+    AllowedValues: ['yes', 'no']
+    Default: 'no'
+
+  UserData:
+    Type: String
+    Default: |
+        #!/bin/bash
+
+        sudo apt install unzip
+        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+        unzip awscliv2.zip
+        sudo ./aws/install
+
+        sudo apt-get update
+        sudo apt install nginx -y
+        cd /var/www/html
+
+        echo "<html>" > index.html
+        echo "<h1>Welcome to CodeStar</h1>" >> index.html
+        echo "<h4>You are running instance from this IP (This is for testing purpose only, you should not public this to user):</h4>"
+        echo "<br>Private IP: " >> index.html
+        curl http://169.254.169.254/latest/meta-data/local-ipv4 >> index.html
+
+        echo "<br>Public IP: " >> index.html
+        curl http://169.254.169.254/latest/meta-data/public-ipv4 >> index.html 
+        echo "</html>" >> index.html
+        
+
+# Mappings: 
+
+Conditions:
+  isOpenHTTP: !Equals [!Ref OpenHTTP, 'yes']
+
+Resources:
+  myEC2:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-055d15d9cfddf7bd3
+      InstanceType: !Ref InstanceType
+      NetworkInterfaces: 
+      - AssociatePublicIpAddress: "true"
+        DeviceIndex: "0"
+        GroupSet: 
+          !If
+            - isOpenHTTP
+            - [!Ref OpenSSHSG, !Ref OpenHTTPSG] 
+            - [!Ref OpenSSHSG]
+        SubnetId: 
+          Ref: Subnet
+
+      KeyName: !Ref KeyName
+      Tags:
+        - Key: Name
+          Value: !Join ["-", [!Ref ProjectName, !Ref ProjectEnvironment]]
+      UserData: 
+        Fn::Base64: !Ref UserData
+        
+
+  OpenSSHSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Limits security group ingress traffic for ssh
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref SSHAllowIps
+ 
+      Tags:
+        - Key: Name
+          Value: !Join ["-", [!Ref ProjectName, !Ref ProjectEnvironment]]
+  
+  OpenHTTPSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Limits security group ingress traffic for http
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+ 
+      Tags:
+        - Key: Name
+          Value: !Join ["-", [!Ref ProjectName, !Ref ProjectEnvironment]]
+
+
+Outputs:
+  InstanceId:
+    Description: This is instance id
+    Value: !Ref myEC2
+
+  PublicIP:
+    Description: This is public IP of EC2
+    Value: !GetAtt myEC2.PublicIp 
+  
+  PrivateIP:
+    Description: This is private IP of EC2
+    Value: !GetAtt myEC2.PrivateIp

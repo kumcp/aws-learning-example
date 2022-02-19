@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Define a new route table 
+Description: Define a new route table and its attachment to related subnet
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
@@ -22,7 +22,7 @@ Metadata:
       ProjectEnvironment:
         default: 'Project environment'
       Subnet:
-        default: 'Subnet subnet'
+        default: 'Subnet'
       VPC:
         label: Choose VPC
       IGWId:

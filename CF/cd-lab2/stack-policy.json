@@ -1,0 +1,24 @@
+{
+    "Statement": [
+        {
+            "Effect": "Deny",
+            "Principal": "*",
+            "Action": "Update:*",
+            "Resource": "*",
+            "Condition": {
+                "StringEquals": {
+                    "ResourceType": [
+                        "AWS::VPC::Instance",
+                        "AWS::RDS::DBInstance"
+                    ]
+                }
+            }
+        },
+        {
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "Update:*",
+            "Resource": "*"
+        }
+    ]
+}

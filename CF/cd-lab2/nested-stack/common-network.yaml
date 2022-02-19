@@ -14,6 +14,12 @@ Metadata:
         Parameters:
           - VpcCIDRBlock
 
+      - Label:
+          default: 'VPC configuration'
+        Parameters:
+          - PublicCIDRBlock
+          - PrivateCIDRBlock
+
     ParameterLabels:
       ProjectName:
         default: 'Project name'
@@ -21,9 +27,9 @@ Metadata:
         default: 'Project environment'
       VpcCIDRBlock:
         default: 'Type of EC2 Instance'
-      PublicCIDR:
+      PublicCIDRBlock:
         default: 'Public subnet CIDR'
-      PrivateCIDR:
+      PrivateCIDRBlock:
         default: 'Private subnet CIDR'
 
 Parameters: 

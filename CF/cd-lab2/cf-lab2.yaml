@@ -2,16 +2,43 @@ AWSTemplateFormatVersion: 2010-09-09
 
 Description: This script create an EC2 has bootstrap script with a Role and a VPC corresponding
 
-Metadata: 
+Metadata:
   Instance: 
     Description: Instance will based on an ubuntu 20 (free tier)
   VPC:
-    Description: A public VPC
+    Description: A VPC contains 1 public subnet and 1 private subnet
   Role:
     Description: A new Role will be created. This role will have the ability to access a specific RDS
   RDS:
     Description: A new RDS with a specific name will be created if it doesn't exist.
-    
+  
+
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: 'Project Setup'
+        Parameters:
+          - ProjectName
+          - ProjectEnvironment
+      
+      - Label:
+          default: 'VPC configuration'
+        Parameters:
+          - VpcCIDRBlock
+          - PublicCIDRBlock
+          - PrivateCIDRBlock
+
+    ParameterLabels:
+      ProjectName:
+        default: 'Project name'
+      ProjectEnvironment:
+        default: 'Project environment'
+      VpcCIDRBlock:
+        default: 'Type of EC2 Instance'
+      PublicCIDRBlock:
+        default: 'Public subnet CIDR'
+      PrivateCIDRBlock:
+        default: 'Private subnet CIDR'
 
 Parameters:
   Ec2KeyName:
@@ -30,14 +57,64 @@ Parameters:
   SSHAllowIps:
     Type: String
     AllowedPattern: "([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})/([0-9]{1,2})"
-    ConstraintDescription: You need to specify IP range can ssh to this EC2 instance 
+    ConstraintDescription: You need to specify IP range can ssh to this EC2 instance
+  
+  ProjectName:
+    Type: String
+    Default: demo
 
-Mappings: 
+  ProjectEnvironment:
+    Type: String
+    Default: test
 
-Conditions: 
+  VpcCIDRBlock:
+    Type: String
+    Default: 10.0.0.0/16
+
+  PublicCIDRBlock:
+    Type: String
+    Default: 10.0.0.0/24
+
+  PrivateCIDRBlock:
+    Type: String
+    Default: 10.0.1.0/24
+
+# Mappings: 
+
+# Conditions: 
 
 Resources: 
-
+  VPCNetwork:
+    Type: AWS::CloudFormation::Stack
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      TemplateURL: >-
+        https://raw.githubusercontent.com/kumcp/aws-learning-example/main/CF/cd-lab2/nested-stack/common-network.yaml
+      Parameters:
+        ProjectName: !Ref ProjectName
+        ProjectEnvironment: !Ref ProjectEnvironment
+        VpcCIDRBlock: !Ref VpcCIDRBlock
+        PublicCIDRBlock: !Ref PublicCIDRBlock
+        PrivateCIDRBlock: !Ref PrivateCIDRBlock
   
+  WorkloadInstance:
+    Type: AWS::CloudFormation::Stack
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      TemplateURL: >-
+        https://raw.githubusercontent.com/kumcp/aws-learning-example/main/CF/cd-lab2/single-resource-stack/ec2-with-sg.yaml
+      Parameters:
+        ProjectName: !Ref ProjectName
+        ProjectEnvironment: !Ref ProjectEnvironment
+        VPC: !GetAtt VPCNetwork.Outputs.VPCId
+        Subnet: !GetAtt VPCNetwork.Outputs.PublicSubnetId
+        InstanceType: !Ref InstanceType
+        SSHAllowIps: !Ref SSHAllowIps
+        KeyName: !Ref Ec2KeyName
+        OpenHTTP: 'yes'
 
-Outputs:
+#   RDS:
+
+# Outputs:
