@@ -58,6 +58,7 @@ Parameters:
     Type: String
     AllowedPattern: "([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})/([0-9]{1,2})"
     ConstraintDescription: You need to specify IP range can ssh to this EC2 instance
+    Default: 0.0.0.0/0
   
   ProjectName:
     Type: String
@@ -79,6 +80,10 @@ Parameters:
     Type: String
     Default: 10.0.1.0/24
 
+  ProjectParam:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /demo/test/projectParam
+
 # Mappings: 
 
 # Conditions: 
@@ -90,7 +95,7 @@ Resources:
     UpdateReplacePolicy: Delete
     Properties:
       TemplateURL: >-
-        https://raw.githubusercontent.com/kumcp/aws-learning-example/main/CF/cd-lab2/nested-stack/common-network.yaml
+        https://cf-templates-1egp1niusfxri-ap-southeast-1.s3.ap-southeast-1.amazonaws.com/nested-stack/common-network.yaml
       Parameters:
         ProjectName: !Ref ProjectName
         ProjectEnvironment: !Ref ProjectEnvironment
@@ -104,9 +109,9 @@ Resources:
     UpdateReplacePolicy: Delete
     Properties:
       TemplateURL: >-
-        https://raw.githubusercontent.com/kumcp/aws-learning-example/main/CF/cd-lab2/single-resource-stack/ec2-with-sg.yaml
+        https://cf-templates-1egp1niusfxri-ap-southeast-1.s3.ap-southeast-1.amazonaws.com/single-resource-stack/ec2-with-sg.yaml
       Parameters:
-        ProjectName: !Ref ProjectName
+        ProjectName: !Join ['-', [!Ref ProjectName, !Ref ProjectParam]]
         ProjectEnvironment: !Ref ProjectEnvironment
         VPC: !GetAtt VPCNetwork.Outputs.VPCId
         Subnet: !GetAtt VPCNetwork.Outputs.PublicSubnetId

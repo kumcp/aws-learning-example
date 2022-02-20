@@ -34,10 +34,12 @@ Metadata:
 
 Parameters: 
   ProjectName:
+    Default: demo
     Description: You need to specify a project name for all the stack you are creating.
     Type: String
 
   ProjectEnvironment:
+    Default: test
     Description: You need to specify a name of the environment.
     Type: String
 
@@ -71,12 +73,13 @@ Resources:
     UpdateReplacePolicy: Delete
     Properties:
       TemplateURL: >-
-        https://raw.githubusercontent.com/kumcp/aws-learning-example/main/CF/cd-lab2/single-resource-stack/VPC.yaml
+        https://cf-templates-1egp1niusfxri-ap-southeast-1.s3.ap-southeast-1.amazonaws.com/single-resource-stack/VPC.yaml
       Parameters:
         ProjectName: !Ref ProjectName
         ProjectEnvironment: !Ref ProjectEnvironment
         VpcCIDRBlock: !Ref VpcCIDRBlock
         IncludeIGW: true
+        
   
   SubnetPrivatePublic:
     Type: AWS::CloudFormation::Stack
@@ -84,7 +87,7 @@ Resources:
     UpdateReplacePolicy: Delete
     Properties:
       TemplateURL: >-
-        https://raw.githubusercontent.com/kumcp/aws-learning-example/main/CF/cd-lab2/single-resource-stack/subnet.yaml
+        https://cf-templates-1egp1niusfxri-ap-southeast-1.s3.ap-southeast-1.amazonaws.com/single-resource-stack/subnet.yaml
       Parameters:
         ProjectName: !Ref ProjectName
         ProjectEnvironment: !Ref ProjectEnvironment
@@ -98,7 +101,7 @@ Resources:
     UpdateReplacePolicy: Delete
     Properties:
       TemplateURL: >-
-        https://raw.githubusercontent.com/kumcp/aws-learning-example/main/CF/cd-lab2/single-resource-stack/route-table.yaml
+        https://cf-templates-1egp1niusfxri-ap-southeast-1.s3.ap-southeast-1.amazonaws.com/single-resource-stack/route-table.yaml
       Parameters:
         ProjectName: !Ref ProjectName
         ProjectEnvironment: !Ref ProjectEnvironment

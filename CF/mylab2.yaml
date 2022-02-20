@@ -1,0 +1,41 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  Env:
+    Type: String
+    Default: stag
+    AllowedValues: [stag, prod]
+
+Mappings:
+  env:
+    stag: 
+      mySSHAllow: 0.0.0.0/0
+      myInstanceType: t2.micro
+
+    prod:
+      mySSHAllow: 1.2.3.4/32
+      myInstanceType: t2.small
+
+Conditions:
+  isProd: !Equals [!Ref Env, prod]
+
+Resources:
+  myStackWithParams:
+    
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://cf-templates-1egp1niusfxri-ap-southeast-1.s3.ap-southeast-1.amazonaws.com/nested-stack/mylab1.yaml
+      Parameters:
+        myInstanceType: !FindInMap [env, !Ref Env, myInstanceType]
+        mySSHAllow: !FindInMap [env, !Ref Env, mySSHAllow]
+
+  bastionHost:
+    Condition: isProd
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-055d15d9cfddf7bd3
+      InstanceType: !FindInMap [env, !Ref Env, myInstanceType]
+      KeyName: codestar-do11
+      Tags:
+        - Key: Name
+          Value: bastionHost

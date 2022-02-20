@@ -1,0 +1,58 @@
+AWSTemplateFormatVersion: 2010-09-09
+# Description: ---
+# Metadata: 
+
+Parameters: 
+  myInstanceType:
+    Default: t2.micro
+    AllowedValues: [t2.micro, t2.small]
+    Type: String
+    Description: Input instance type  
+
+  mySSHAllow:
+    Default: 0.0.0.0/0
+    Type: String
+    AllowedPattern: "([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})/([0-9]{1,2})"
+    ConstraintDescription: You need to specify IP range can ssh to this EC2 instance
+
+# Mappings: 
+
+# Conditions: 
+
+Resources:
+  myEC2:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-055d15d9cfddf7bd3
+      InstanceType: !Ref myInstanceType
+      SecurityGroups: [!Ref mySG]
+      KeyName: codestar-do11
+      Tags:
+        - Key: Name
+          Value: cf-lab1
+
+  mySG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Limits security group egress traffic
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref mySSHAllow
+ 
+      Tags:
+        - Key: Name
+          Value: cf-lab1
+
+Outputs:
+  PublicIP:
+    Description: This is public IP of EC2
+    Value: 
+      Fn::GetAtt: 
+        - myEC2
+        - PublicIp 
+  
+  PrivateIP:
+    Description: This is private IP of EC2
+    Value: !GetAtt [myEC2, PrivateIp]
