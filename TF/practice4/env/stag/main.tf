@@ -67,7 +67,7 @@ module "public_ec2" {
   source = "../../module/public_ec2"
 
   vpc_id        = module.vpc.vpc_id
-  subnet_id     = module.vpc.private_subnets[0]
+  subnet_id     = module.vpc.public_subnets[0] # staging can use public subnet
   instance_type = local.instance_type
   instance_name = local.instance_name
 

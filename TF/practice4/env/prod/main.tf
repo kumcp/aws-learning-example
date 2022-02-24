@@ -4,6 +4,7 @@ terraform {
       source  = "hashicorp/aws"
       version = "3.72.0"
     }
+
   }
 }
 
@@ -23,97 +24,56 @@ provider "aws" {
 ###### Pre defined AWS modules
 
 locals {
-  project_name = "myapp"
+  project_name = var.appname # "demo"
+
+  vpc_cidr          = "10.0.0.0/16"
+  private_nets_cidr = ["10.0.1.0/24", "10.0.2.0/24"]
+  public_nets_cidr  = ["10.0.3.0/24", "10.0.4.0/24"]
+
+  instance_type = "t2.micro"
+  instance_name = "prod-instance"
 
   common_tags = {
     Project     = local.project_name
-    Environment = "stag"
+    Environment = var.env # "stag"
   }
 }
 
+data "aws_availability_zones" "current_az_list" {
+  state = "available"
+}
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "3.12.0"
 
 
-  name = "my-vpc"
-  cidr = "10.0.0.0/16"
+  name = join("-", tolist(["vpc", local.project_name]))
+  cidr = local.vpc_cidr
 
-  azs             = ["ap-southeast-1a", "ap-southeast-1b"]
-  private_subnets = ["10.0.1.0/24", "10.0.2.0/24"]
-  public_subnets  = ["10.0.3.0/24", "10.0.4.0/24"]
+  azs             = data.aws_availability_zones.current_az_list.names
+  private_subnets = local.private_nets_cidr
+  public_subnets  = local.public_nets_cidr
 
-  #   enable_nat_gateway = true
-  #   enable_vpn_gateway = true
+  enable_nat_gateway = true
+  enable_vpn_gateway = true
 
   tags = local.common_tags
 
 }
 
 
-# module "instance" {
-#   source = "../module/ec2_ebs"
-# }
+module "public_ec2" {
+  source = "../../module/public_ec2"
 
-resource "aws_network_interface" "instance_eni" {
-  subnet_id = module.vpc.private_subnets[0]
+  vpc_id        = module.vpc.vpc_id
+  subnet_id     = module.vpc.private_subnets[0]
+  instance_type = local.instance_type
+  instance_name = local.instance_name
 
-  tags = merge(local.common_tags,
-    tomap({
-      Name = "primary_network_interface"
-  }))
+  common_tags = local.common_tags
 }
 
-resource "aws_instance" "project_instance" {
-
-  ami           = "ami-055d15d9cfddf7bd3"
-  instance_type = "t2.micro"
-
-  network_interface {
-    network_interface_id = aws_network_interface.instance_eni.id
-    device_index         = 0
-  }
-
-  tags = merge(local.common_tags,
-    tomap({
-      Name = "demo"
-  }))
-}
-
-resource "aws_security_group" "allow_http" {
-  name        = "allow_http"
-  description = "Allow HTTP inbound traffic"
-  vpc_id      = module.vpc.vpc_id
-
-  ingress {
-    description = "HTTP from VPC"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
-
-  tags = merge(local.common_tags,
-    tomap({
-      Name = "allow_http"
-  }))
-
-}
-
-# resource "aws_lb_target_group_attachment" "tg_attachment" {
-#   target_group_arn = module.alb.arn
-#   target_id        = aws_instance.project_instance.id
-#   port             = 80
-# }
 
 module "alb" {
   source  = "terraform-aws-modules/alb/aws"
@@ -125,7 +85,7 @@ module "alb" {
 
   vpc_id          = module.vpc.vpc_id
   subnets         = module.vpc.public_subnets
-  security_groups = [aws_security_group.allow_http.id]
+  security_groups = [module.public_ec2.allow_http_sg]
 
   # access_logs = {
   #   bucket = "my-alb-logs"
@@ -139,21 +99,13 @@ module "alb" {
       target_type      = "instance"
       targets = [
         {
-          target_id = aws_instance.project_instance.id
+          target_id = module.public_ec2.instance_id
           port      = 80
         }
       ]
     }
   ]
 
-  #   https_listeners = [
-  #     {
-  #       port               = 443
-  #       protocol           = "HTTPS"
-  #       certificate_arn    = "arn:aws:iam::123456789012:server-certificate/test_cert-123456789012"
-  #       target_group_index = 0
-  #     }
-  #   ]
 
   http_tcp_listeners = [
     {
