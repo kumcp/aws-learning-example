@@ -1,0 +1,21 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Demo using stack
+# Metadata: 
+
+# Parameters: 
+
+# Mappings: 
+
+# Conditions: 
+
+Resources:
+  myStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://cf-templates-1egp1niusfxri-ap-southeast-1.s3.ap-southeast-1.amazonaws.com/mylab3.yaml
+      Parameters:
+        env: prod
+        project: stackproject
+        instanceType: t3.micro
+
+# Outputs:

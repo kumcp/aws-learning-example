@@ -15,6 +15,16 @@ Parameters:
     AllowedPattern: "([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})/([0-9]{1,2})"
     ConstraintDescription: You need to specify IP range can ssh to this EC2 instance
 
+  ProjectName:
+    Default: demo
+    Type: String
+    Description: Project name
+
+  ProjectEnv:
+    Default: test
+    Type: String
+    AllowedValues: [test, stag, dev, build, prod]
+
 # Mappings: 
 
 # Conditions: 
@@ -29,8 +39,12 @@ Resources:
       KeyName: codestar-do11
       Tags:
         - Key: Name
-          Value: cf-lab1
-
+          Value: !Join ["-", [!Ref ProjectName, !Ref ProjectEnv]]
+        - Key: project
+          Value: !Ref ProjectName
+        - Key: env
+          Value: !Ref ProjectEnv
+    
   mySG:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -43,16 +57,17 @@ Resources:
  
       Tags:
         - Key: Name
-          Value: cf-lab1
+          Value: !Join ["-", [!Ref ProjectName, !Ref ProjectEnv]]
+        - Key: project
+          Value: !Ref ProjectName
+        - Key: env
+          Value: !Ref ProjectEnv
 
 Outputs:
   PublicIP:
     Description: This is public IP of EC2
-    Value: 
-      Fn::GetAtt: 
-        - myEC2
-        - PublicIp 
+    Value: !GetAtt myEC2.PublicIp 
   
   PrivateIP:
     Description: This is private IP of EC2
-    Value: !GetAtt [myEC2, PrivateIp]
+    Value: !GetAtt myEC2.PrivateIp

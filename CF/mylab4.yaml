@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: 2010-09-09
+# Description: ---
+# Metadata: 
+
+Parameters: 
+
+  ProjectName:
+    Default: aaaa
+    Type: String
+    Description: Project name
+
+
+# Mappings: 
+
+# Conditions: 
+
+Resources:
+  VPCNetwork:
+    Type: AWS::CloudFormation::Stack
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      TemplateURL: >-
+        https://cf-templates-1egp1niusfxri-ap-southeast-1.s3.ap-southeast-1.amazonaws.com/nested-stack/mylab3.yaml
+      Parameters:
+        ProjectName: !Ref ProjectName
+        ProjectEnv: test
+
+# Outputs:

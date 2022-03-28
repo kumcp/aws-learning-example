@@ -1,0 +1,102 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: ---
+# Metadata: 
+
+Parameters:
+  env:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - stag
+      - prod
+
+  project:
+    Type: String
+    Default: demo
+
+  instanceType:
+    Type: String
+    Default: t2.micro
+    AllowedValues:
+      - t2.micro
+      - t3.micro
+
+# Mappings: 
+
+# Conditions: 
+
+Resources:
+  myInstance:
+    Type: AWS::EC2::Instance
+    Properties: 
+      ImageId: ami-055d15d9cfddf7bd3 
+      KeyName: do0803
+      InstanceType: !Ref instanceType
+      SecurityGroupIds: [!Ref mySG]
+      Tags:
+        - Key: Name
+          Value: !Join ["-", [!Ref project, !Ref env, "instance"]]
+        - Key: project
+          Value: !Ref project
+        - Key: env
+          Value: !Ref env
+
+  mySG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow ssh to client host
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+
+      Tags:
+        - Key: Name
+          Value: !Join ["-", [!Ref project, !Ref env, "sg"]]
+        - Key: project
+          Value: !Ref project
+        - Key: env
+          Value: !Ref env
+
+  myInstance2:
+    Type: AWS::EC2::Instance
+    Properties: 
+      ImageId: ami-055d15d9cfddf7bd3 
+      KeyName: do0803
+      InstanceType: t2.micro
+      SecurityGroupIds: [!Ref mySG80]
+
+      Tags:
+        - Key: Name
+          Value: !Join ["-", [!Ref project, !Ref env, "instance2"]]
+        - Key: project
+          Value: !Ref project
+        - Key: env
+          Value: !Ref env
+
+  mySG80:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow ssh to client host
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: !Join ["-", [!Ref project, !Ref env, "sg"]]
+        - Key: project
+          Value: !Ref project
+        - Key: env
+          Value: !Ref env
+      
+
+Outputs:
+  publicIP1:
+    Value: !GetAtt myInstance.PublicIp
+
+  publicIP2:
+    Value: !GetAtt myInstance2.PublicIp

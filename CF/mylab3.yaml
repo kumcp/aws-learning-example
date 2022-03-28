@@ -1,0 +1,106 @@
+AWSTemplateFormatVersion: 2010-09-09
+# Description: ---
+# Metadata: 
+
+Parameters: 
+
+  ProjectName:
+    Default: demo
+    Type: String
+    Description: Project name
+
+  ProjectEnv:
+    Default: test
+    Type: String
+    AllowedValues: [test, stag, dev, build, prod]
+
+# Mappings: 
+
+# Conditions: 
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties: 
+      CidrBlock: 10.0.0.0/16
+
+  privateSubnet:
+    Type: AWS::EC2::Subnet
+    Properties: 
+      CidrBlock: 10.0.0.0/24
+      Tags: 
+        - Key: project
+          Value: !Ref ProjectName 
+        - Key: Name
+          Value: !Join ["-", [!Ref ProjectName, !Ref ProjectEnv]]
+
+      VpcId: !Ref VPC
+
+  publicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties: 
+      CidrBlock: 10.0.1.0/24
+      Tags: 
+        - Key: project
+          Value: !Ref ProjectName
+        - Key: Name
+          Value: !Join ["-", [!Ref ProjectName, !Ref ProjectEnv]]
+      VpcId: !Ref VPC
+
+  publicRTB:
+    Type: AWS::EC2::RouteTable
+    Properties: 
+      Tags: 
+        - Key: project
+          Value: !Ref ProjectName
+        - Key: Name
+          Value: !Join ["-", [!Ref ProjectName, !Ref ProjectEnv]]
+      VpcId: !Ref VPC
+
+  privateRTB:
+    Type: AWS::EC2::RouteTable
+    Properties: 
+      Tags: 
+        - Key: project
+          Value: !Ref ProjectName
+        - Key: Name
+          Value: !Join ["-", [!Ref ProjectName, !Ref ProjectEnv]]
+
+      VpcId: !Ref VPC
+  
+  IGW:
+    Type: AWS::EC2::InternetGateway
+    Properties: 
+      Tags: 
+        - Key: project
+          Value: !Ref ProjectName
+        - Key: Name
+          Value: !Join ["-", [!Ref ProjectName, !Ref ProjectEnv]]
+
+  IGWAttach:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties: 
+      InternetGatewayId: !Ref IGW
+      VpcId: !Ref VPC
+
+  IGWPublicAddRoute:
+    Type: AWS::EC2::Route
+    Properties: 
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref IGW
+      RouteTableId: !Ref publicRTB
+
+  AssociateRTB2PublicSubnet:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: 
+      RouteTableId: !Ref publicRTB
+      SubnetId: !Ref publicSubnet
+
+  AssociateRTB2PrivateSubnet:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: 
+      RouteTableId: !Ref privateRTB
+      SubnetId: !Ref privateSubnet
+
+
+# Outputs:
