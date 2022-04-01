@@ -14,18 +14,14 @@ provider "aws" {
   region  = "ap-southeast-1"
 }
 
-test_map = {
- test1 = "test2",
- test2 = "test4"
-}
 
 resource "aws_instance" "myapp" {
   ami           = "ami-055d15d9cfddf7bd3"
   instance_type = "t2.micro"
-  for_each      = tomap(["1" = "a", "2" = "b"])
+
 
   tags = {
-    Name = "${var.instance_name}-${each.key}"
+    Name = "${var.instance_name}"
   }
 }
 

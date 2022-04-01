@@ -2,39 +2,50 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "3.72.0"
+      version = "~> 3.27"
     }
   }
+
+  required_version = ">= 0.14.9"
 }
 
+
 provider "aws" {
-  region = "ap-southeast-1"
+  profile = "default"
+  region  = "ap-southeast-1"
+}
+
+locals {
+  ami           = var.ami
+  instance_type = var.instance_type
+  name          = var.project_name
 }
 
 resource "aws_instance" "myapp" {
-  ami           = "ami-055d15d9cfddf7bd3"
-  instance_type = "t2.micro"
-
-  security_groups = [aws_security_group.allow_ssh.name]
+  ami           = local.ami
+  instance_type = local.instance_type
 
   tags = {
-    name = var.instance_name
+    Name = local.name
   }
+
+  security_groups = [aws_security_group.allow_ssh.name]
 }
 
+
 resource "aws_security_group" "allow_ssh" {
-  name        = "allow-ssh2"
+  name        = "allow-ssh-lab2"
   description = "Allow SSH inbound traffic"
 
-  ingress {
+  ingress { // inbound
     description = "Allow SSH"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = [var.allow_ssh]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
-  egress {
+  egress { // outbound
     from_port        = 0
     to_port          = 0
     protocol         = "-1"

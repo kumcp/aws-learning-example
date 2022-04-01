@@ -1,4 +1,5 @@
 
+
 locals {
   vpc_id        = var.vpc_id
   subnet        = var.subnet_id
@@ -13,15 +14,15 @@ locals {
 
 resource "aws_network_interface" "instance_eni" {
   subnet_id       = local.subnet
-  security_groups = [aws_security_group.allow_http.name]
-
-  tags = local.common_tags
+  tags            = local.common_tags
+  security_groups = [aws_security_group.allow_http.id]
 }
 
 resource "aws_instance" "this" {
 
   ami           = local.ami
   instance_type = local.instance_type
+
 
   network_interface {
     network_interface_id = aws_network_interface.instance_eni.id
