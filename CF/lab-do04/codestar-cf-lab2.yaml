@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: 2010-09-09
+# Description: ---
+# Metadata: 
+
+Parameters:
+  instanceType: 
+    Type: String
+    AllowedValues:
+      - t2.micro
+      - t3.micro
+      - m1.small
+    Default: t2.micro
+
+  keyName:
+    Type: String
+    Default: mykeyname
+
+# Mappings: 
+
+# Conditions: 
+
+Resources:
+  myEC2:
+    Type: AWS::EC2::Instance
+    Properties: 
+      ImageId: ami-04d9e855d716f9c99
+      InstanceType: !Ref instanceType
+      KeyName: !Ref keyName
+      SecurityGroupIds:
+        - !Ref mySG
+  
+  mySG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow http to client host
+      VpcId: vpc-019fd1323e1610f3f
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+      Tags:
+        - Key: Name
+          Value: mySG
+  myEC2New:
+    Type: AWS::EC2::Instance
+    Properties: 
+      ImageId: ami-04d9e855d716f9c99
+      InstanceType: !Ref instanceType
+      KeyName: !Ref keyName
+      SecurityGroupIds:
+        - !Ref mySG
+  
+Outputs:
+  mainEC2Id:
+    Value: !Ref myEC2
+
+  mainEC2PublicAddress:
+    Value: !GetAtt myEC2.PublicIp
+  

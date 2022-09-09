@@ -1,0 +1,41 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: ---
+# Metadata: 
+
+Parameters: 
+  instanceType:
+    Type: String
+    AllowedValues:
+      - t2.micro
+      - t3.micro
+
+  allowedIPs:
+    Type: String
+    Default: 0.0.0.0/0
+
+
+# Mappings: 
+
+# Conditions: 
+
+Resources:
+  myEC2:
+    Type: AWS::EC2::Instance
+    Properties: 
+      ImageId: ami-02ee763250491e04a
+      KeyName: do2806
+      InstanceType: !Ref instanceType
+      SecurityGroupIds:
+        - !Ref mySG
+
+  mySG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow port 22
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref allowedIPs
+
+# Outputs:

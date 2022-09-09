@@ -1,4 +1,4 @@
-version: '3.1'
+version: '3.9'
 
 services:
   adminer:
@@ -12,3 +12,4 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: mypassword
+      MYSQL_DATABASE: mydb

@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: ---
+# Metadata: 
+
+Parameters:
+  keyname:
+    Type: String
+    Default: do02
+  imageId:
+    Type: String
+    Default: ami-055d15d9cfddf7bd3
+  instanceType:
+    Type: String
+    AllowedValues:
+      - t2.micro
+      - t3.micro
+  
+  cidrblock:
+    Type: String
+    Default: 0.0.0.0/0
+
+# Mappings: 
+
+# Conditions: 
+
+Resources:
+  myEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: !Ref keyname
+      ImageId: !Ref imageId
+      InstanceType: !Ref instanceType
+      SecurityGroupIds:
+        - !Ref mySG
+
+  mySG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow http to client host
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref cidrblock
+
+# Outputs:

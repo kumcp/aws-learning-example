@@ -1,0 +1,123 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: ---
+# Metadata: 
+
+Parameters: 
+  ProjectName:
+    Default: demo
+    Type: String
+
+  ProjectEnv:
+    Type: String
+    Default: test
+
+# Mappings: 
+
+# Conditions: 
+
+Resources:
+  myVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      Tags:
+        - Key: Name
+          Value: !Join ["-",[!Ref ProjectName, !Ref ProjectEnv]]
+        - Key: Project
+          Value: !Ref ProjectName
+        - Key: Env
+          Value: !Ref ProjectEnv
+  
+  subnetPublic:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: ap-southeast-1a
+      VpcId: !Ref myVPC
+      CidrBlock: 10.0.0.0/24
+      Tags:
+        - Key: Name
+          Value: !Join ["-",[!Ref ProjectName, !Ref ProjectEnv, "public"]]
+        - Key: Project
+          Value: !Ref ProjectName
+        - Key: Env
+          Value: !Ref ProjectEnv
+  
+  subnetPrivate:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: ap-southeast-1b
+      VpcId: !Ref myVPC
+      CidrBlock: 10.0.1.0/24
+      Tags:
+        - Key: Name
+          Value: !Join ["-",[!Ref ProjectName, !Ref ProjectEnv, "private"]]
+        - Key: Project
+          Value: !Ref ProjectName
+        - Key: Env
+          Value: !Ref ProjectEnv
+
+  publicRTB:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref myVPC
+      Tags:
+        - Key: Name
+          Value: !Join ["-",[!Ref ProjectName, !Ref ProjectEnv]]
+        - Key: Project
+          Value: !Ref ProjectName
+        - Key: Env
+          Value: !Ref ProjectEnv
+
+  privateRTB:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref myVPC
+      Tags:
+        - Key: Name
+          Value: !Join ["-",[!Ref ProjectName, !Ref ProjectEnv]]
+        - Key: Project
+          Value: !Ref ProjectName
+        - Key: Env
+          Value: !Ref ProjectEnv
+
+  IGW:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Join ["-",[!Ref ProjectName, !Ref ProjectEnv]]
+        - Key: Project
+          Value: !Ref ProjectName
+        - Key: Env
+          Value: !Ref ProjectEnv
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref myVPC
+      InternetGatewayId: !Ref IGW
+
+  attachIGWRTB:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref publicRTB
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref IGW
+
+  routeTableAssocpublic:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref subnetPublic
+      RouteTableId: !Ref publicRTB
+
+  routeTableAssocprivate:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref subnetPrivate
+      RouteTableId: !Ref privateRTB   
+
+Outputs:
+  publicSubnet:
+    Value: !GetAtt subnetPublic.SubnetId
+
+  privateSubnet:
+    Value: !GetAtt subnetPrivate.SubnetId

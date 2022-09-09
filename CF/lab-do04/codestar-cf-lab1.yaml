@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: 2010-09-09
+# Description: ---
+# Metadata: 
+
+# Parameters: 
+
+# Mappings: 
+
+# Conditions: 
+
+Resources:
+  myEC2:
+    Type: AWS::EC2::Instance
+    Properties: 
+      ImageId: ami-04d9e855d716f9c99
+      InstanceType: t2.micro
+      KeyName: do2704
+      SecurityGroupIds:
+        - !Ref mySG
+  
+  mySG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow http to client host
+      VpcId: vpc-019fd1323e1610f3f
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+      Tags:
+        - Key: Name
+          Value: mySG
+# Outputs:

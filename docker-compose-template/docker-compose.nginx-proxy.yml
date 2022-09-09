@@ -1,0 +1,20 @@
+version: '3.1'
+
+services:
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "80:8080"
+    environment:
+      - VIRTUAL_HOST=adminer.localhost
+  
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    ports:
+      - "8000:80"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    environment:
+      - VIRTUAL_PROTO=fastcgi
+      - DEFAULT_HOST=adminer.localhost
