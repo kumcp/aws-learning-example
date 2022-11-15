@@ -18,7 +18,7 @@ locals {
   private_cidr_block = var.private_cidr_block
   public_cidr_block  = var.public_cidr_block
   instance_type      = var.instance_type
-  project_name       = "lab4"
+  project_name       = var.project_name
 }
 
 
@@ -99,6 +99,17 @@ resource "aws_route_table" "private-rtb" {
   tags = {
     "Name" = "private-rtb",
   }
+}
+
+// Route Table association
+resource "aws_route_table_association" "route_public_subnet" {
+  subnet_id      = aws_subnet.public_net.id
+  route_table_id = aws_route_table.public-rtb.id
+}
+
+resource "aws_route_table_association" "route_private_subnet" {
+  subnet_id      = aws_subnet.private_net.id
+  route_table_id = aws_route_table.private-rtb.id
 }
 
 // Dynamic AMI (no a static ami id)
