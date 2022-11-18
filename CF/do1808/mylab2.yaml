@@ -1,0 +1,21 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: ---
+# Metadata: 
+
+# Parameters: 
+
+# Mappings: 
+
+# Conditions: 
+
+Resources:
+  mylab1:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: "https://thanhcv-codestar-aws2108.s3.ap-southeast-1.amazonaws.com/mylab1.yaml"
+      Parameters:
+        InputAmiId: "ami-04ff9e9b51c1f62ca"
+        KeyPair: "do1808"
+        InstanceTypeNo1: "t2.micro"
+
+# Outputs:

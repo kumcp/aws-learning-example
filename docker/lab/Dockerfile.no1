@@ -1,0 +1,9 @@
+FROM ubuntu:jammy
+
+RUN apt-get update -y
+
+RUN apt-get install nginx -y
+
+COPY entrypoint.sh /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]

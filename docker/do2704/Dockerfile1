@@ -1,0 +1,5 @@
+FROM ubuntu
+
+COPY ./a.sh /app/a.sh
+
+CMD sh /app/a.sh

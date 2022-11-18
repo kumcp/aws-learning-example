@@ -25,7 +25,7 @@ resource "aws_instance" "myapp" {
 
 
 resource "aws_security_group" "allow_ssh" {
-  name        = "allow-ssh-lab2"
+  name        = "allow-ssh-${var.project_name}"
   description = "Allow SSH inbound traffic"
   vpc_id      = local.vpc_id
 

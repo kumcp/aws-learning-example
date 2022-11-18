@@ -1,0 +1,50 @@
+AWSTemplateFormatVersion: 2010-09-09
+# Description:
+# Metadata:
+
+Parameters:
+  InputAmiId:
+    Default: "ami-02ee763250491e04a"
+    Type: AWS::EC2::Image::Id
+    Description: "AMI Id"
+    AllowedValues:
+      - "ami-02ee763250491e04a"
+      - "ami-04ff9e9b51c1f62ca"
+
+  KeyPair:
+    Default: "do1808"
+    Type: String
+
+  InstanceTypeNo1:
+    Type: String
+    Default: "t2.micro"
+
+
+# Mappings: 
+
+# Conditions: 
+
+Resources:
+  serverX: 
+    Type: AWS::EC2::Instance
+    Properties: 
+      ImageId: !Ref InputAmiId
+      KeyName: !Ref KeyPair
+      InstanceType: !Ref InstanceTypeNo1
+      SecurityGroupIds:
+        - !Ref MySecurityGroup
+
+
+  MySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow http to client host
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+Outputs:
+  publicIp:
+    Value: !GetAtt serverX.PublicIp

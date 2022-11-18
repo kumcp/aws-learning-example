@@ -1,0 +1,20 @@
+AWSTemplateFormatVersion: 2010-09-09
+# Description: ---
+# Metadata: 
+
+# Parameters: 
+
+# Mappings: 
+
+# Conditions: 
+
+Resources:
+  myStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://codestar-do02.s3.ap-southeast-1.amazonaws.com/mylab2.yaml
+      Parameters:
+        ProjectName: codestary
+        ProjectEnv: prod
+
+# Outputs:

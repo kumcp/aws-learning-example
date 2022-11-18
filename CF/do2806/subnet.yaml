@@ -1,0 +1,67 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: ---
+# Metadata: 
+
+Parameters: 
+
+  projectName:
+    Type: String
+    Default: demo
+
+  env:
+    Type: String
+    AllowedValues:
+      - stag
+      - prod
+
+Mappings:
+  paramByEnv:
+    stag:
+      instanceType: t2.micro
+      keypair: do2806
+
+    prod:
+      instanceType: t3.micro
+      keypair: do2806
+  
+
+# Conditions: 
+
+Resources:
+  myVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      Tags:
+        - Key: project
+          Value: !Join ["-", [!Ref projectName, "vpc"]]
+
+  publicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref myVPC
+      CidrBlock: 10.0.0.0/24
+      Tags:
+        - Key: project
+          Value: !Join ["-", [!Ref projectName, "subnet"]]
+
+  myEC2:
+    Type: AWS::EC2::Instance
+    Properties: 
+      SubnetId: !Ref publicSubnet
+      ImageId: ami-02ee763250491e04a
+      KeyName: !FindInMap
+        - paramByEnv
+        - !Ref env
+        - keypair
+      
+      InstanceType: !FindInMap
+        - paramByEnv
+        - !Ref env
+        - instanceType
+
+
+Outputs:
+  publicSubnetVPCId: 
+    Value: !GetAtt publicSubnet.VpcId

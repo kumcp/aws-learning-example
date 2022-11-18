@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: 2010-09-09
+# Description: ---
+# Metadata: 
+
+Parameters:
+  instanceType: 
+    Type: String
+    AllowedValues:
+      - t2.micro
+      - t3.micro
+      - m1.small
+    Default: t2.micro
+
+  keyName:
+    Type: String
+    Default: mykeyname
+
+# Mappings: 
+
+# Conditions: 
+
+
+Resources:
+  myStackWithParams:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://do04.s3.ap-southeast-1.amazonaws.com/codestar-cf-lab2.yaml
+      Parameters:
+        instanceType: t3.micro
+        keyName: do2704
+  
+Outputs:
+
+  mainEC2PublicAddress:
+    Value: !GetAtt myStackWithParams.Outputs.mainEC2PublicAddress
+  

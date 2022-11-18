@@ -1,5 +1,5 @@
 
-FROM alpine
+FROM ubuntu
 
 
 RUN echo "This is the command will run in build time"
