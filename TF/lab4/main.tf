@@ -142,7 +142,8 @@ resource "aws_instance" "public_instance" {
 resource "aws_instance" "private_instance" {
   ami           = data.aws_ami.ubuntu.id
   instance_type = local.instance_type
-  subnet_id     = aws_subnet.public_net.id
+
+  subnet_id = aws_subnet.public_net.id
 
   tags = {
     Name = "private-instance"
