@@ -3,7 +3,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.27"
+      version = "4.41.0"
     }
   }
 
@@ -21,6 +21,9 @@ locals {
   region             = "ap-southeast-1"
   vpc_cidr_block     = "10.0.0.0/16"
   subnets_cidr_block = "10.0.1.0/24"
+
+  db_username = "admin"
+  db_password = "12345678"
 
   instance_type = "t2.micro"
   common_tags = {
@@ -107,6 +110,45 @@ resource "aws_instance" "main" {
 
   tags = local.common_tags
 
-  user_data = templatefile("./script/userdata.sh", {})
+  key_name = aws_key_pair.keypair.key_name
+  user_data = templatefile("./script/userdata.sh", {
+    db_host : aws_db_instance.main_db.address,
+    db_user : local.db_username,
+    db_pass : local.db_password
+  })
+
+  depends_on = [
+    aws_db_instance.main_db
+  ]
+}
+
+### Export key pair and save to local file in this folder
+resource "tls_private_key" "private_key" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_key_pair" "keypair" {
+  key_name   = "codestar-deployment-key"
+  public_key = tls_private_key.private_key.public_key_openssh
+
+  provisioner "local-exec" {
+    command = "echo '${tls_private_key.private_key.private_key_pem}' > ./codestar-deployment-key.pem && chmod 400 ./codestar-deployment-key.pem"
+  }
+}
+
+
+#### DB instance
+
+resource "aws_db_instance" "main_db" {
+  allocated_storage    = 10
+  db_name              = "codestar_learning"
+  engine               = "mysql"
+  engine_version       = "5.7"
+  instance_class       = "db.t2.micro"
+  username             = local.db_username
+  password             = local.db_password
+  parameter_group_name = "default.mysql5.7"
+  skip_final_snapshot  = true
 }
 
