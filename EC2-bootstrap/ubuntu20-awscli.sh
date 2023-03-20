@@ -31,5 +31,4 @@ echo "<br>Public IP: " >> index.html
 curl $METADATA/latest/meta-data/public-ipv4 >> index.html 
 echo "</html>" >> index.html 
 
-echo "</html>" >> index.html
 
