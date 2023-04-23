@@ -1,0 +1,56 @@
+# https://docs.aws.amazon.com/managed-blockchain/latest/hyperledger-fabric-dev/get-started-create-client.html
+
+
+sudo yum update -y
+
+# Install docker, docker-compose, go
+sudo yum install jq telnet emacs docker libtool libtool-ltdl-devel git -y
+sudo service docker start
+sudo usermod -a -G docker ec2-user
+sudo curl -L https://github.com/docker/compose/releases/download/1.20.0/docker-compose-`uname \
+-s`-`uname -m` -o /usr/local/bin/docker-compose
+sudo chmod a+x /usr/local/bin/docker-compose
+wget https://dl.google.com/go/go1.14.4.linux-amd64.tar.gz
+tar -xzf go1.14.4.linux-amd64.tar.gz
+sudo mv go /usr/local
+
+
+
+sudo yum install git -y
+vim .bash_profile
+source ~/.bash_profile 
+sudo docker version
+sudo /usr/local/bin/docker-compose version
+go version
+
+export N_ID=n-5PJBUXPJPBDMRCI6M7N53BMDSQ
+export M_ID=m-JCFN45CVZVCVZD3AJVNDQXQYJU
+
+
+# Create role and has policy
+
+
+aws managedblockchain get-member --network-id $N_ID --member-id $M_ID
+
+export CAENDPOINT=ca.m-jcfn45cvzvcvzd3ajvndqxqyju.n-5pjbuxpjpbdmrci6m7n53bmdsq.managedblockchain.ap-southeast-1.amazonaws.com:30002
+
+# Create project
+mkdir -p /home/ec2-user/go/src/github.com/hyperledger/fabric-ca
+
+cd /home/ec2-user/go/src/github.com/hyperledger/fabric-ca
+
+wget https://github.com/hyperledger/fabric-ca/releases/download/v1.4.7/hyperledger-fabric-ca-linux-amd64-1.4.7.tar.gz
+
+tar -xzf hyperledger-fabric-ca-linux-amd64-1.4.7.tar.gz
+
+cd /home/ec2-user
+
+git clone --branch v2.2.3 https://github.com/hyperledger/fabric-samples.git
+
+
+#####
+
+fabric-ca-client enroll \
+-u 'https://codestar:Thanh001@$CASERVICEENDPOINT' \
+--tls.certfiles /home/ec2-user/managedblockchain-tls-chain.pem -M /home/ec2-user/admin-msp
+
