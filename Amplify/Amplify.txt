@@ -1,0 +1,15 @@
+## Amplify
+
+### 1. Service
+
+- Amplify is a managed service which allow you to build and deploy Frontend/Backend in a CI/CD flow without complexity. 
+- Have no ability to manage and maintain the environment of the deploy environment.
+- 
+
+
+### 2. Detail
+
+
+### 3. Domain:
+
+- Amplify allows using other domains (ACM will create a certificate -> Update CNAME record in DNS service -> wait.
