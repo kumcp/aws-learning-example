@@ -78,7 +78,7 @@ resource "aws_iam_role" "lab22_role" {
     ]
   })
 
-  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3FullAccess"]
+  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3FullAccess","arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
 
   tags = local.common_tags
 }
