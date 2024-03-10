@@ -25,10 +25,10 @@ else
     export METADATA='-s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254'    
 fi
 echo "<br>Private IP: " >> index.html
-curl $METADATA/latest/meta-data/local-ipv4 >> index.html
+curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/local-ipv4 >> index.html
 
 echo "<br>Public IP: " >> index.html
-curl $METADATA/latest/meta-data/public-ipv4 >> index.html 
+curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/public-ipv4 >> index.html 
 echo "</html>" >> index.html 
 
 
