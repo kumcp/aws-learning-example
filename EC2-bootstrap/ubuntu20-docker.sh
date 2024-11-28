@@ -25,3 +25,7 @@ sudo chmod +x /usr/local/bin/docker-compose
 # sudo chmod 666 /var/run/docker.sock
 sudo usermod -aG docker ubuntu
 # sudo usermod -aG docker $USER
+
+# Take effect immediately without necessary to logout and login again. Cause the process of the current user and group will be hold.
+# Not neccessary for bootstrap script but left it here for other use.
+newgrp docker
