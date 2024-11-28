@@ -22,4 +22,6 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io -y
 sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
 
-sudo chmod 666 /var/run/docker.sock
+# sudo chmod 666 /var/run/docker.sock
+sudo usermod -aG docker ubuntu
+# sudo usermod -aG docker $USER
